@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "642970217514",
+    "project_id": "shades-of-skin",
+    "storage_bucket": "shades-of-skin.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642970217514:android:da53a7417399aab119a753",
+        "android_client_info": {
+          "package_name": "com.example.food_delivery_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "642970217514-daotgi35qkjhh1670in14drebjig0hkv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCSBKdmMUxUaE7WYQ8z40a5YketKj87zQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "642970217514-daotgi35qkjhh1670in14drebjig0hkv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "642970217514-bnnufn1dmauv8kj77t440q4qs2r21r9m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.shadesOfSkin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642970217514:android:a4883f75d8796ad619a753",
+        "android_client_info": {
+          "package_name": "com.example.shades_of_skin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "642970217514-ncs3o3bhqacmebcg5612u1o8d49r2plj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.shades_of_skin",
+            "certificate_hash": "f7b96e596069afdb927c149a28bc745322f49608"
+          }
+        },
+        {
+          "client_id": "642970217514-daotgi35qkjhh1670in14drebjig0hkv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCSBKdmMUxUaE7WYQ8z40a5YketKj87zQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "642970217514-daotgi35qkjhh1670in14drebjig0hkv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "642970217514-bnnufn1dmauv8kj77t440q4qs2r21r9m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.shadesOfSkin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
