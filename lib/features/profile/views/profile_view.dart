@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../app/routes/app_routes.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/my_button.dart';
 import '../../../core/widgets/my_text.dart';
+import '../../auth/controllers/auth_controller.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends GetView<AuthController> {
   final bool isSeller;
 
   const ProfileView({super.key, required this.isSeller});
 
   @override
   Widget build(BuildContext context) {
+    final user = controller.currentUser;
+    final name = user?.name ?? 'User';
+    final email = user?.email ?? '';
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+
     return Scaffold(
       appBar: AppBar(title: const MyText.title(AppStrings.profile)),
       body: ListView(
@@ -31,23 +36,27 @@ class ProfileView extends StatelessWidget {
                 CircleAvatar(
                   radius: 32,
                   backgroundColor: AppColors.chipBg,
-                  child: Text(
-                    'A',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
+                  backgroundImage:
+                      user?.photoUrl != null ? NetworkImage(user!.photoUrl!) : null,
+                  child: user?.photoUrl == null
+                      ? Text(
+                          initial,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      MyText.title('Alex Morgan'),
-                      SizedBox(height: 4),
-                      MyText.caption('alex@email.com'),
+                    children: [
+                      MyText.title(name),
+                      const SizedBox(height: 4),
+                      MyText.caption(email),
                     ],
                   ),
                 ),
@@ -57,8 +66,8 @@ class ProfileView extends StatelessWidget {
           const SizedBox(height: 24),
           const MyText.subtitle(AppStrings.account),
           const SizedBox(height: 12),
-          _infoTile(Icons.person_outline, AppStrings.name, 'Alex Morgan'),
-          _infoTile(Icons.email_outlined, AppStrings.email, 'alex@email.com'),
+          _infoTile(Icons.person_outline, AppStrings.name, name),
+          _infoTile(Icons.email_outlined, AppStrings.email, email),
           const SizedBox(height: 24),
           const MyText.subtitle(AppStrings.switchRole),
           const SizedBox(height: 8),
@@ -72,18 +81,14 @@ class ProfileView extends StatelessWidget {
               ButtonSegment(value: true, label: Text(AppStrings.sellerMode)),
             ],
             selected: {isSeller},
-            onSelectionChanged: (set) {
-              final seller = set.first;
-              if (seller == isSeller) return;
-              Get.offAllNamed(seller ? AppRoutes.sellerShell : AppRoutes.buyerShell);
-            },
+            onSelectionChanged: (set) => controller.switchRole(set.first),
           ),
           const SizedBox(height: 32),
           MyButton(
             label: AppStrings.signOut,
             outlined: true,
             color: AppColors.error,
-            onTap: () => Get.offAllNamed(AppRoutes.login),
+            onTap: controller.signOut,
           ),
         ],
       ),

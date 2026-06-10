@@ -5,6 +5,7 @@ class AppStrings {
   static const continueWithGoogle = 'Continue with Google';
   static const welcomeBack = 'Welcome back';
   static const signInToOrder = 'Sign in to start ordering';
+  static const signInFailed = 'Sign in failed';
 
   static const home = 'Home';
   static const cart = 'Cart';

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../features/auth/bindings/auth_binding.dart';
 import '../../features/auth/views/login_view.dart';
 import '../../features/buyer/checkout/views/checkout_view.dart';
 import '../../features/buyer/orders/views/order_detail_view.dart';
@@ -14,10 +15,26 @@ class AppPages {
   static const initial = AppRoutes.splash;
 
   static final routes = [
-    GetPage(name: AppRoutes.splash, page: () => const SplashView()),
-    GetPage(name: AppRoutes.login, page: () => const LoginView()),
-    GetPage(name: AppRoutes.buyerShell, page: () => const BuyerShellView()),
-    GetPage(name: AppRoutes.sellerShell, page: () => const SellerShellView()),
+    GetPage(
+      name: AppRoutes.splash,
+      page: () => const SplashView(),
+      binding: AuthBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.login,
+      page: () => const LoginView(),
+      binding: AuthBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.buyerShell,
+      page: () => const BuyerShellView(),
+      binding: AuthBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.sellerShell,
+      page: () => const SellerShellView(),
+      binding: AuthBinding(),
+    ),
     GetPage(
       name: AppRoutes.productDetail,
       page: () => const ProductDetailView(),

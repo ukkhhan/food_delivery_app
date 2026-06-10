@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../app/routes/app_routes.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/my_button.dart';
 import '../../../core/widgets/my_text.dart';
+import '../controllers/auth_controller.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends GetView<AuthController> {
   const LoginView({super.key});
 
   @override
@@ -36,10 +36,13 @@ class LoginView extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
               const Spacer(flex: 3),
-              MyButton(
-                label: AppStrings.continueWithGoogle,
-                icon: Icons.g_mobiledata_rounded,
-                onTap: () => Get.offAllNamed(AppRoutes.buyerShell),
+              Obx(
+                () => MyButton(
+                  label: AppStrings.continueWithGoogle,
+                  icon: Icons.g_mobiledata_rounded,
+                  isLoading: controller.isLoading.value,
+                  onTap: controller.signInWithGoogle,
+                ),
               ),
               const SizedBox(height: 32),
             ],

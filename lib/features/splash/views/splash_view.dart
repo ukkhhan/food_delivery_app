@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../app/routes/app_routes.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/my_text.dart';
+import '../../auth/controllers/auth_controller.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -18,7 +18,8 @@ class _SplashViewState extends State<SplashView> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) Get.offAllNamed(AppRoutes.login);
+      if (!mounted) return;
+      Get.find<AuthController>().routeFromSession();
     });
   }
 
