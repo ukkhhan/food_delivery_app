@@ -72,7 +72,7 @@ class _ProductRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            ProductImage(productId: item.id, height: 56, width: 56),
+            ProductImage(imageKey: item.imageKey, productId: item.id, height: 56, width: 56),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

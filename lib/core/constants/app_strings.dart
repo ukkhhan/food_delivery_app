@@ -22,6 +22,14 @@ class AppStrings {
   static const checkout = 'Checkout';
   static const placeOrder = 'Place Order';
   static const payWithStripe = 'Pay with Stripe';
+  static const payNow = 'Pay now';
+  static const stripeTestMode = 'Stripe Test Mode';
+  static const stripePayAmount = 'Pay';
+  static const stripeTestHint = 'Use Stripe test card';
+  static const stripeInvalidTestCard = 'Use test card 4242 4242 4242 4242';
+  static const cardNumber = 'Card number';
+  static const expiry = 'Expiry';
+  static const cvc = 'CVC';
   static const orderSummary = 'Order Summary';
   static const subtotal = 'Subtotal';
   static const deliveryFee = 'Delivery Fee';
@@ -48,6 +56,31 @@ class AppStrings {
   static const noNotifications = 'No notifications';
   static const noNotificationsHint = 'Updates about your orders appear here';
   static const markAllRead = 'Mark all read';
+
+  static const notifOrderPlacedTitle = 'Order placed';
+  static const notifNewOrderTitle = 'New order';
+  static const notifPreparingTitle = 'Preparing your order';
+  static const notifOnTheWayTitle = 'Out for delivery';
+  static const notifDeliveredTitle = 'Order delivered';
+  static const notifOrderDeliveredTitle = 'Order delivered';
+
+  static String notifOrderPlacedBody(String orderId) =>
+      '$orderId is confirmed.';
+
+  static String notifNewOrderBody(String orderId, String buyer, int items) =>
+      '$orderId from $buyer — $items item${items == 1 ? '' : 's'}.';
+
+  static String notifPreparingBody(String orderId) =>
+      '$orderId is being prepared.';
+
+  static String notifOnTheWayBody(String orderId) =>
+      '$orderId is on the way to you.';
+
+  static String notifDeliveredBody(String orderId) =>
+      '$orderId has been delivered. Enjoy!';
+
+  static String notifOrderDeliveredBody(String orderId) =>
+      '$orderId marked as delivered.';
 
   static const switchRole = 'Switch Role';
   static const buyerMode = 'Buyer';

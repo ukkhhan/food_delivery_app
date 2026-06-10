@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:get/get.dart';
 
+import '../../../../core/constants/image_refs.dart';
 import '../../../../core/models/food_item.dart';
 import '../local/product_image_db.dart';
 import '../remote/product_remote_service.dart';
@@ -38,9 +39,12 @@ class ProductRepository extends GetxService {
       'sellerId': sellerId,
     });
 
+    String? imageKey;
     if (imageBytes != null) {
+      imageKey = ImageRefs.localKey(id);
       await _imageDb.saveImage(id, imageBytes);
-      _imageCache[id] = imageBytes;
+      _imageCache[imageKey] = imageBytes;
+      await _remote.update(id, {'imageKey': imageKey});
     }
 
     return FoodItem(
@@ -50,6 +54,7 @@ class ProductRepository extends GetxService {
       price: price,
       category: category,
       sellerId: sellerId,
+      imageKey: imageKey,
     );
   }
 
@@ -59,39 +64,51 @@ class ProductRepository extends GetxService {
     required String description,
     required double price,
     required String category,
+    String? existingImageKey,
     Uint8List? imageBytes,
   }) async {
-    await _remote.update(id, {
+    final updates = <String, dynamic>{
       'name': name,
       'description': description,
       'price': price,
       'category': category,
-    });
+    };
 
     if (imageBytes != null) {
+      final imageKey = ImageRefs.localKey(id);
       await _imageDb.saveImage(id, imageBytes);
-      _imageCache[id] = imageBytes;
+      _imageCache[imageKey] = imageBytes;
+      updates['imageKey'] = imageKey;
+    } else if (existingImageKey != null) {
+      updates['imageKey'] = existingImageKey;
     }
+
+    await _remote.update(id, updates);
   }
 
   Future<void> deleteProduct(String id) async {
     await _remote.delete(id);
     await _imageDb.deleteImage(id);
-    _imageCache.remove(id);
+    _imageCache.remove(ImageRefs.localKey(id));
   }
 
-  Future<Uint8List?> getImage(String productId) async {
-    if (_imageCache.containsKey(productId)) {
-      return _imageCache[productId];
+  Future<Uint8List?> getImageByRef(String? imageKey) async {
+    final sqliteKey = ImageRefs.sqliteKeyFromRef(imageKey);
+    if (sqliteKey == null) return null;
+
+    if (_imageCache.containsKey(imageKey)) {
+      return _imageCache[imageKey];
     }
 
-    final bytes = await _imageDb.getImage(productId);
+    final bytes = await _imageDb.getImage(sqliteKey);
     if (bytes == null) return null;
 
     final data = Uint8List.fromList(bytes);
-    _imageCache[productId] = data;
+    _imageCache[imageKey!] = data;
     return data;
   }
 
-  void clearImageCache(String productId) => _imageCache.remove(productId);
+  void clearImageCache(String? imageKey) {
+    if (imageKey != null) _imageCache.remove(imageKey);
+  }
 }

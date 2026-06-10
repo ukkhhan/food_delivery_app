@@ -130,6 +130,7 @@ class ProductController extends GetxController {
           description: description,
           price: price,
           category: category,
+          existingImageKey: existing.imageKey,
           imageBytes: imageBytes,
         );
       }

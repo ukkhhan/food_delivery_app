@@ -1,72 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/data/mock_data.dart';
 import '../../../../core/models/notification_model.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/my_text.dart';
+import '../../../../core/widgets/notification_tile.dart';
+import '../../../notifications/controllers/notification_controller.dart';
 
-class SellerNotificationsView extends StatelessWidget {
+class SellerNotificationsView extends GetView<NotificationController> {
   const SellerNotificationsView({super.key});
 
+  IconData _iconFor(NotificationModel item) {
+    if (item.title.toLowerCase().contains('delivered')) {
+      return Icons.check_circle;
+    }
+    return Icons.shopping_bag;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final items = MockData.sellerNotifications;
-
     return Scaffold(
       appBar: AppBar(title: const MyText.title(AppStrings.notifications)),
-      body: items.isEmpty
-          ? const EmptyState(
-              icon: Icons.notifications_none,
-              title: AppStrings.noNotifications,
-              subtitle: AppStrings.noNotificationsHint,
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: items.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (_, i) => _Tile(item: items[i]),
-            ),
-    );
-  }
-}
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-class _Tile extends StatelessWidget {
-  final NotificationModel item;
+        final items = controller.forAudience(NotificationAudience.seller);
+        if (items.isEmpty) {
+          return const EmptyState(
+            icon: Icons.notifications_none,
+            title: AppStrings.noNotifications,
+            subtitle: AppStrings.noNotificationsHint,
+          );
+        }
 
-  const _Tile({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: item.isRead ? AppColors.surface : AppColors.chipBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            item.title.contains('delivered') ? Icons.check_circle : Icons.shopping_bag,
-            color: item.isRead ? AppColors.textHint : AppColors.primary,
-            size: 22,
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: items.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          itemBuilder: (_, i) => NotificationTile(
+            item: items[i],
+            icon: _iconFor(items[i]),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MyText.subtitle(item.title),
-                const SizedBox(height: 4),
-                MyText.caption(item.body),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }

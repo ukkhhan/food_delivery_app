@@ -153,6 +153,7 @@ class _ProductFormViewState extends State<ProductFormView> {
             onTap: _pickImage,
             child: _existing != null && _imageBytes == null
                 ? ProductImage(
+                    imageKey: _existing!.imageKey,
                     productId: _existing!.id,
                     height: 160,
                     radius: 12,

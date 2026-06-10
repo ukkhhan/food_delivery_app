@@ -6,16 +6,29 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/my_button.dart';
 import '../../../../core/widgets/my_text.dart';
+import '../../../auth/data/services/auth_service.dart';
 import '../../../cart/controllers/cart_controller.dart';
 import '../../../orders/controllers/order_controller.dart';
+import '../../../payment/data/services/stripe_payment_service.dart';
 
 class CheckoutView extends GetView<CartController> {
   const CheckoutView({super.key});
 
   OrderController get _orderController => Get.find<OrderController>();
+  StripePaymentService get _stripe => Get.find<StripePaymentService>();
+  AuthService get _auth => Get.find<AuthService>();
 
-  Future<void> _placeOrder() async {
+  Future<void> _payAndPlaceOrder(BuildContext context) async {
     if (controller.isEmpty) return;
+
+    if (_auth.user.value == null) return;
+
+    final paid = await _stripe.processPayment(
+      context: context,
+      amount: controller.total,
+    );
+
+    if (!paid) return;
 
     final order = await _orderController.placeOrder(controller.items.toList());
     if (order == null) return;
@@ -70,7 +83,7 @@ class CheckoutView extends GetView<CartController> {
                       children: const [
                         MyText.subtitle('Stripe Test Mode'),
                         SizedBox(height: 2),
-                        MyText.caption('Payment connects in the next step'),
+                        MyText.caption('Use test card 4242 4242 4242 4242'),
                       ],
                     ),
                   ),
@@ -83,13 +96,17 @@ class CheckoutView extends GetView<CartController> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Obx(
-            () => MyButton(
-              label: AppStrings.placeOrder,
-              isLoading: _orderController.isProcessing.value,
-              onTap: _placeOrder,
-            ),
-          ),
+          child: Obx(() {
+            final loading = _stripe.isProcessing.value ||
+                _orderController.isProcessing.value;
+
+            return MyButton(
+              label: AppStrings.payWithStripe,
+              icon: Icons.lock_outline,
+              isLoading: loading,
+              onTap: () => _payAndPlaceOrder(context),
+            );
+          }),
         ),
       ),
     );

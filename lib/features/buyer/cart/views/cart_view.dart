@@ -94,7 +94,7 @@ class _CartTile extends GetView<CartController> {
       ),
       child: Row(
         children: [
-          ProductImage(productId: item.id, height: 64, width: 64),
+          ProductImage(imageKey: item.imageKey, productId: item.id, height: 64, width: 64),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

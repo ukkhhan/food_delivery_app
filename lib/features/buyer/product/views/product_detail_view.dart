@@ -45,7 +45,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          ProductImage(productId: item.id, height: 200, radius: 16),
+          ProductImage(imageKey: item.imageKey, productId: item.id, height: 200, radius: 16),
           const SizedBox(height: 20),
           MyText.display(item.name),
           const SizedBox(height: 6),

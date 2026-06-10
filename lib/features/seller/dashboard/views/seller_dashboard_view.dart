@@ -35,7 +35,10 @@ class SellerDashboardView extends GetView<OrderController> {
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: activeOrders.length,
-          itemBuilder: (_, i) => _SellerOrderCard(order: activeOrders[i]),
+          itemBuilder: (_, i) => _SellerOrderCard(
+            key: ValueKey(activeOrders[i].id),
+            orderId: activeOrders[i].id,
+          ),
         );
       }),
     );
@@ -43,9 +46,9 @@ class SellerDashboardView extends GetView<OrderController> {
 }
 
 class _SellerOrderCard extends GetView<OrderController> {
-  final OrderModel order;
+  final String orderId;
 
-  const _SellerOrderCard({required this.order});
+  const _SellerOrderCard({super.key, required this.orderId});
 
   String? _actionLabel(OrderStatus status) {
     switch (status) {
@@ -62,58 +65,61 @@ class _SellerOrderCard extends GetView<OrderController> {
 
   @override
   Widget build(BuildContext context) {
-    final items =
-        order.lines.map((l) => '${l.item.name} x${l.quantity}').join(', ');
-    final nextStatus = order.nextStatus;
-    final actionLabel = nextStatus != null ? _actionLabel(order.status) : null;
+    return Obx(() {
+      final match =
+          controller.orders.where((o) => o.id == orderId).toList();
+      if (match.isEmpty) return const SizedBox.shrink();
+      final order = match.first;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              MyText.subtitle(order.displayId),
-              const Spacer(),
-              OrderStatusChip(status: order.status),
-            ],
-          ),
-          const SizedBox(height: 6),
-          MyText.caption('${order.buyerName} · $items'),
-          const SizedBox(height: 4),
-          MyText.label('\$${order.total.toStringAsFixed(2)}', color: AppColors.primary),
-          const SizedBox(height: 16),
-          const MyText.caption(AppStrings.trackOrder),
-          const SizedBox(height: 8),
-          OrderTrackingSteps(status: order.status, compact: true),
-          if (actionLabel != null && nextStatus != null) ...[
-            const SizedBox(height: 12),
-            Obx(
-              () => MyButton(
-                label: actionLabel,
-                isLoading: controller.isProcessing.value,
-                onTap: () {
-                  final latest = controller.orders.firstWhere(
-                    (o) => o.id == order.id,
-                    orElse: () => order,
-                  );
-                  final next = latest.nextStatus;
-                  if (next != null) {
-                    controller.updateStatus(latest, next);
-                  }
-                },
-              ),
+      final items =
+          order.lines.map((l) => '${l.item.name} x${l.quantity}').join(', ');
+      final nextStatus = order.nextStatus;
+      final actionLabel =
+          nextStatus != null ? _actionLabel(order.status) : null;
+      final isUpdating = controller.processingOrderId.value == orderId;
+
+      return Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                MyText.subtitle(order.displayId),
+                const Spacer(),
+                OrderStatusChip(status: order.status),
+              ],
             ),
+            const SizedBox(height: 6),
+            MyText.caption('${order.buyerName} · $items'),
+            const SizedBox(height: 4),
+            MyText.label(
+              '\$${order.total.toStringAsFixed(2)}',
+              color: AppColors.primary,
+            ),
+            const SizedBox(height: 16),
+            const MyText.caption(AppStrings.trackOrder),
+            const SizedBox(height: 8),
+            OrderTrackingSteps(status: order.status, compact: true),
+            if (actionLabel != null && nextStatus != null) ...[
+              const SizedBox(height: 12),
+              MyButton(
+                label: actionLabel,
+                isLoading: isUpdating,
+                onTap: isUpdating
+                    ? null
+                    : () => controller.updateStatus(orderId, nextStatus),
+              ),
+            ],
           ],
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 }

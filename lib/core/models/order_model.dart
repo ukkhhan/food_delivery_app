@@ -20,6 +20,7 @@ class OrderLine {
       'price': item.price,
       'category': item.category,
       'sellerId': item.sellerId,
+      'imageKey': item.imageKey,
       'quantity': quantity,
     };
   }
@@ -33,6 +34,7 @@ class OrderLine {
         price: (map['price'] as num?)?.toDouble() ?? 0,
         category: map['category'] as String? ?? '',
         sellerId: map['sellerId'] as String? ?? '',
+        imageKey: map['imageKey'] as String?,
       ),
       quantity: (map['quantity'] as num?)?.toInt() ?? 1,
     );
@@ -116,6 +118,18 @@ class OrderModel {
       case OrderStatus.delivered:
         return null;
     }
+  }
+
+  OrderModel copyWith({OrderStatus? status}) {
+    return OrderModel(
+      id: id,
+      buyerId: buyerId,
+      buyerName: buyerName,
+      sellerId: sellerId,
+      lines: lines,
+      status: status ?? this.status,
+      createdAt: createdAt,
+    );
   }
 
   static String statusToString(OrderStatus status) {

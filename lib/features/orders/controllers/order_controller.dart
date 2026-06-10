@@ -7,6 +7,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/models/order_model.dart';
 import '../../auth/data/services/auth_service.dart';
 import '../../cart/models/cart_item.dart';
+import '../../notifications/data/repositories/notification_repository.dart';
 import '../data/repositories/order_repository.dart';
 
 class OrderController extends GetxController {
@@ -14,11 +15,13 @@ class OrderController extends GetxController {
 
   final bool sellerMode;
   final OrderRepository _repository = Get.find<OrderRepository>();
+  final NotificationRepository _notifications = Get.find<NotificationRepository>();
   final AuthService _authService = Get.find<AuthService>();
 
   final orders = <OrderModel>[].obs;
   final isLoading = true.obs;
   final isProcessing = false.obs;
+  final processingOrderId = RxnString();
 
   StreamSubscription<List<OrderModel>>? _subscription;
 
@@ -95,6 +98,9 @@ class OrderController extends GetxController {
         sellerId: sellerId,
         items: cartItems,
       );
+      try {
+        await _notifications.notifyOrderPlaced(order);
+      } catch (_) {}
       await refreshOrders();
       return order;
     } catch (e) {
@@ -110,12 +116,28 @@ class OrderController extends GetxController {
     }
   }
 
-  Future<void> updateStatus(OrderModel order, OrderStatus status) async {
+  Future<void> updateStatus(String orderId, OrderStatus status) async {
+    final index = orders.indexWhere((order) => order.id == orderId);
+    if (index == -1) return;
+
+    final previous = orders[index];
     isProcessing.value = true;
+    processingOrderId.value = orderId;
+
+    orders[index] = previous.copyWith(status: status);
+    orders.refresh();
+
     try {
-      await _repository.updateStatus(order.id, status);
-      await refreshOrders();
+      await _repository.updateStatus(orderId, status);
+      try {
+        await _notifications.notifyStatusUpdate(
+          previous.copyWith(status: status),
+          status,
+        );
+      } catch (_) {}
     } catch (e) {
+      orders[index] = previous;
+      orders.refresh();
       Get.snackbar(
         AppStrings.saveFailed,
         e.toString(),
@@ -124,6 +146,7 @@ class OrderController extends GetxController {
       );
     } finally {
       isProcessing.value = false;
+      processingOrderId.value = null;
     }
   }
 }

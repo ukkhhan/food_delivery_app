@@ -112,7 +112,7 @@ class _FoodCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            ProductImage(productId: item.id, height: 72, width: 72),
+            ProductImage(imageKey: item.imageKey, productId: item.id, height: 72, width: 72),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
