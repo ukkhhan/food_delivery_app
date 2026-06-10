@@ -4,33 +4,39 @@ import 'package:get/get.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/data/mock_data.dart';
 import '../../../../core/models/order_model.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/order_status_chip.dart';
 import '../../../../core/widgets/my_text.dart';
+import '../../../orders/controllers/order_controller.dart';
 
-class OrdersView extends StatelessWidget {
+class OrdersView extends GetView<OrderController> {
   const OrdersView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final orders = MockData.orders;
-
     return Scaffold(
       appBar: AppBar(title: const MyText.title(AppStrings.orderHistory)),
-      body: orders.isEmpty
-          ? const EmptyState(
-              icon: Icons.receipt_long_outlined,
-              title: AppStrings.noOrdersYet,
-              subtitle: AppStrings.noOrdersHint,
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: orders.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (_, i) => _OrderCard(order: orders[i]),
-            ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.orders.isEmpty) {
+          return const EmptyState(
+            icon: Icons.receipt_long_outlined,
+            title: AppStrings.noOrdersYet,
+            subtitle: AppStrings.noOrdersHint,
+          );
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: controller.orders.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          itemBuilder: (_, i) => _OrderCard(order: controller.orders[i]),
+        );
+      }),
     );
   }
 }
@@ -40,7 +46,8 @@ class _OrderCard extends StatelessWidget {
 
   const _OrderCard({required this.order});
 
-  String _formatDate(DateTime dt) {
+  String _formatDate(DateTime? dt) {
+    if (dt == null) return '';
     return '${dt.day}/${dt.month}/${dt.year} · ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
@@ -63,7 +70,7 @@ class _OrderCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                MyText.subtitle(order.id),
+                MyText.subtitle(order.displayId),
                 const Spacer(),
                 OrderStatusChip(status: order.status),
               ],

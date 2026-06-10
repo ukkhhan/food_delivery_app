@@ -5,77 +5,66 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/models/order_model.dart';
 import '../../../../core/widgets/order_status_chip.dart';
+import '../../../../core/widgets/order_tracking_steps.dart';
 import '../../../../core/widgets/my_text.dart';
+import '../../../orders/controllers/order_controller.dart';
 
-class OrderDetailView extends StatelessWidget {
+class OrderDetailView extends GetView<OrderController> {
   const OrderDetailView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final order = Get.arguments as OrderModel;
+  OrderModel get _initialOrder => Get.arguments as OrderModel;
 
-    return Scaffold(
-      appBar: AppBar(title: const MyText.title(AppStrings.orderDetails)),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Row(
-            children: [
-              MyText.title(order.id),
-              const Spacer(),
-              OrderStatusChip(status: order.status),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const MyText.subtitle(AppStrings.trackOrder),
-          const SizedBox(height: 16),
-          _step(AppStrings.orderPlaced, true),
-          _step(AppStrings.preparing, order.status.index >= 1),
-          _step(AppStrings.onTheWay, order.status.index >= 2),
-          _step(AppStrings.delivered, order.status == OrderStatus.delivered),
-          const SizedBox(height: 24),
-          const MyText.subtitle(AppStrings.orderSummary),
-          const SizedBox(height: 12),
-          ...order.lines.map(
-            (line) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Row(
-                children: [
-                  Expanded(child: MyText.body('${line.item.name} x${line.quantity}')),
-                  MyText.body('\$${line.total.toStringAsFixed(2)}'),
-                ],
-              ),
-            ),
-          ),
-          const Divider(height: 28),
-          _totalRow(AppStrings.subtotal, order.subtotal),
-          _totalRow(AppStrings.deliveryFee, order.deliveryFee),
-          _totalRow(AppStrings.total, order.total, bold: true),
-        ],
-      ),
+  OrderModel get _order {
+    return controller.orders.firstWhere(
+      (o) => o.id == _initialOrder.id,
+      orElse: () => _initialOrder,
     );
   }
 
-  Widget _step(String label, bool done) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: done ? AppColors.primary : AppColors.border,
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const MyText.title(AppStrings.orderDetails)),
+      body: Obx(() {
+        final order = _order;
+
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Row(
+              children: [
+                MyText.title(order.displayId),
+                const Spacer(),
+                OrderStatusChip(status: order.status),
+              ],
             ),
-            child: done
-                ? const Icon(Icons.check, size: 14, color: Colors.white)
-                : null,
-          ),
-          const SizedBox(width: 12),
-          MyText.body(label, color: done ? AppColors.textPrimary : AppColors.textHint),
-        ],
-      ),
+            const SizedBox(height: 24),
+            const MyText.subtitle(AppStrings.trackOrder),
+            const SizedBox(height: 16),
+            OrderTrackingSteps(status: order.status),
+            const SizedBox(height: 24),
+            const MyText.subtitle(AppStrings.orderSummary),
+            const SizedBox(height: 12),
+            ...order.lines.map(
+              (line) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: MyText.body('${line.item.name} x${line.quantity}'),
+                    ),
+                    MyText.body('\$${line.total.toStringAsFixed(2)}'),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(height: 28),
+            _totalRow(AppStrings.subtotal, order.subtotal),
+            _totalRow(AppStrings.deliveryFee, order.deliveryFee),
+            _totalRow(AppStrings.total, order.total, bold: true),
+          ],
+        );
+      }),
     );
   }
 

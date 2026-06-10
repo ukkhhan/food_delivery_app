@@ -6,6 +6,8 @@ import '../../features/buyer/checkout/views/checkout_view.dart';
 import '../../features/buyer/orders/views/order_detail_view.dart';
 import '../../features/buyer/product/views/product_detail_view.dart';
 import '../../features/buyer/shell/buyer_shell_view.dart';
+import '../../features/orders/bindings/order_binding.dart';
+import '../../features/orders/controllers/order_controller.dart';
 import '../../features/products/bindings/buyer_shell_binding.dart';
 import '../../features/products/bindings/product_binding.dart';
 import '../../features/products/bindings/seller_shell_binding.dart';
@@ -43,8 +45,24 @@ class AppPages {
       name: AppRoutes.productDetail,
       page: () => const ProductDetailView(),
     ),
-    GetPage(name: AppRoutes.checkout, page: () => const CheckoutView()),
-    GetPage(name: AppRoutes.orderDetail, page: () => const OrderDetailView()),
+    GetPage(
+      name: AppRoutes.checkout,
+      page: () => const CheckoutView(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<OrderController>()) {
+          OrderBinding(sellerMode: false).dependencies();
+        }
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.orderDetail,
+      page: () => const OrderDetailView(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<OrderController>()) {
+          OrderBinding(sellerMode: false).dependencies();
+        }
+      }),
+    ),
     GetPage(
       name: AppRoutes.productForm,
       page: () => const ProductFormView(),

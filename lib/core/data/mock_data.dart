@@ -1,55 +1,6 @@
-import '../models/food_item.dart';
 import '../models/notification_model.dart';
-import '../models/order_model.dart';
 
 class MockData {
-  static const foods = [
-    FoodItem(
-      id: '1',
-      name: 'Classic Burger',
-      description: 'Juicy beef patty, cheddar, lettuce and house sauce.',
-      price: 8.99,
-      category: 'Burger',
-      sellerId: 'mock',
-    ),
-    FoodItem(
-      id: '2',
-      name: 'Margherita Pizza',
-      description: 'Fresh mozzarella, basil and tomato on thin crust.',
-      price: 11.50,
-      category: 'Pizza',
-      sellerId: 'mock',
-    ),
-    FoodItem(
-      id: '3',
-      name: 'Iced Latte',
-      description: 'Cold brew espresso with milk over ice.',
-      price: 4.25,
-      category: 'Drinks',
-      sellerId: 'mock',
-    ),
-  ];
-
-  static final orders = [
-    OrderModel(
-      id: 'ORD-1042',
-      lines: [
-        OrderLine(item: foods[0], quantity: 2),
-        OrderLine(item: foods[2], quantity: 1),
-      ],
-      status: OrderStatus.preparing,
-      createdAt: DateTime.now().subtract(const Duration(minutes: 25)),
-      buyerName: 'Alex',
-    ),
-    OrderModel(
-      id: 'ORD-1038',
-      lines: [OrderLine(item: foods[1], quantity: 1)],
-      status: OrderStatus.delivered,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-      buyerName: 'Alex',
-    ),
-  ];
-
   static final buyerNotifications = [
     NotificationModel(
       id: 'n1',

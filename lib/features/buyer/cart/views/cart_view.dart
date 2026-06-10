@@ -4,63 +4,55 @@ import 'package:get/get.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/data/mock_data.dart';
-import '../../../../core/models/food_item.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/product_image.dart';
 import '../../../../core/widgets/my_button.dart';
 import '../../../../core/widgets/my_text.dart';
+import '../../../cart/controllers/cart_controller.dart';
+import '../../../cart/models/cart_item.dart';
 
-class CartView extends StatelessWidget {
+class CartView extends GetView<CartController> {
   const CartView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final lines = [
-      (MockData.foods[0], 2),
-      (MockData.foods[2], 1),
-    ];
-
-    if (lines.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const MyText.title(AppStrings.yourCart)),
-        body: const EmptyState(
-          icon: Icons.shopping_bag_outlined,
-          title: AppStrings.cartEmpty,
-          subtitle: AppStrings.cartEmptyHint,
-        ),
-      );
-    }
-
-    final subtotal = lines.fold<double>(
-      0,
-      (sum, e) => sum + e.$1.price * e.$2,
-    );
-    const delivery = 2.99;
-    final total = subtotal + delivery;
-
     return Scaffold(
       appBar: AppBar(title: const MyText.title(AppStrings.yourCart)),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          ...lines.map((e) => _CartTile(item: e.$1, qty: e.$2)),
-          const SizedBox(height: 16),
-          _summaryRow(AppStrings.subtotal, subtotal),
-          _summaryRow(AppStrings.deliveryFee, delivery),
-          const Divider(height: 24),
-          _summaryRow(AppStrings.total, total, bold: true),
-        ],
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
+      body: Obx(() {
+        if (controller.isEmpty) {
+          return const EmptyState(
+            icon: Icons.shopping_bag_outlined,
+            title: AppStrings.cartEmpty,
+            subtitle: AppStrings.cartEmptyHint,
+          );
+        }
+
+        return ListView(
           padding: const EdgeInsets.all(16),
-          child: MyButton(
-            label: '${AppStrings.checkout} · \$${total.toStringAsFixed(2)}',
-            onTap: () => Get.toNamed(AppRoutes.checkout),
+          children: [
+            ...controller.items.map((line) => _CartTile(line: line)),
+            const SizedBox(height: 16),
+            _summaryRow(AppStrings.subtotal, controller.subtotal),
+            _summaryRow(AppStrings.deliveryFee, controller.deliveryFee),
+            const Divider(height: 24),
+            _summaryRow(AppStrings.total, controller.total, bold: true),
+          ],
+        );
+      }),
+      bottomNavigationBar: Obx(() {
+        if (controller.isEmpty) return const SizedBox.shrink();
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: MyButton(
+              label:
+                  '${AppStrings.checkout} · \$${controller.total.toStringAsFixed(2)}',
+              onTap: () => Get.toNamed(AppRoutes.checkout),
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -82,14 +74,16 @@ class CartView extends StatelessWidget {
   }
 }
 
-class _CartTile extends StatelessWidget {
-  final FoodItem item;
-  final int qty;
+class _CartTile extends GetView<CartController> {
+  final CartItem line;
 
-  const _CartTile({required this.item, required this.qty});
+  const _CartTile({required this.line});
 
   @override
   Widget build(BuildContext context) {
+    final item = line.product;
+    final qty = line.quantity;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -107,8 +101,21 @@ class _CartTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 MyText.subtitle(item.name),
-                const SizedBox(height: 4),
-                MyText.caption('x$qty'),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _qtyBtn(Icons.remove, () {
+                      controller.updateQuantity(item.id, qty - 1);
+                    }),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: MyText.subtitle('$qty'),
+                    ),
+                    _qtyBtn(Icons.add, () {
+                      controller.updateQuantity(item.id, qty + 1);
+                    }),
+                  ],
+                ),
                 const SizedBox(height: 4),
                 MyText.label(
                   '\$${(item.price * qty).toStringAsFixed(2)}',
@@ -118,10 +125,25 @@ class _CartTile extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () => controller.removeItem(item.id),
             child: const MyText.caption(AppStrings.remove, color: AppColors.error),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _qtyBtn(IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Icon(icon, size: 16),
       ),
     );
   }

@@ -7,6 +7,8 @@ import 'core/constants/app_strings.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/controllers/auth_controller.dart';
 import 'features/auth/data/services/auth_service.dart';
+import 'features/cart/controllers/cart_controller.dart';
+import 'features/orders/data/repositories/order_repository.dart';
 import 'features/products/data/local/product_image_db.dart';
 import 'features/products/data/repositories/product_repository.dart';
 import 'firebase_options.dart';
@@ -19,6 +21,8 @@ Future<void> main() async {
   await Get.putAsync<AuthService>(() async => AuthService().init());
   await Get.putAsync<ProductImageDb>(() async => ProductImageDb().init());
   Get.put(ProductRepository(), permanent: true);
+  Get.put(OrderRepository(), permanent: true);
+  Get.put(CartController(), permanent: true);
   Get.put(AuthController(), permanent: true);
   runApp(const FoodDeliveryApp());
 }

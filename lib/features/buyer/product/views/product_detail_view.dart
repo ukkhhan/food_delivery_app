@@ -7,6 +7,7 @@ import '../../../../core/models/food_item.dart';
 import '../../../../core/widgets/product_image.dart';
 import '../../../../core/widgets/my_button.dart';
 import '../../../../core/widgets/my_text.dart';
+import '../../../cart/controllers/cart_controller.dart';
 
 class ProductDetailView extends StatefulWidget {
   const ProductDetailView({super.key});
@@ -18,11 +19,23 @@ class ProductDetailView extends StatefulWidget {
 class _ProductDetailViewState extends State<ProductDetailView> {
   int _qty = 1;
   late final FoodItem item;
+  final _cart = Get.find<CartController>();
 
   @override
   void initState() {
     super.initState();
     item = Get.arguments as FoodItem;
+  }
+
+  void _addToCart() {
+    _cart.addItem(item, _qty);
+    Get.back();
+    Get.snackbar(
+      AppStrings.cart,
+      '${item.name} x$_qty added',
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(16),
+    );
   }
 
   @override
@@ -65,15 +78,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           padding: const EdgeInsets.all(16),
           child: MyButton(
             label: '${AppStrings.addToCart} · \$${(item.price * _qty).toStringAsFixed(2)}',
-            onTap: () {
-              Get.back();
-              Get.snackbar(
-                AppStrings.cart,
-                '${item.name} x$_qty added',
-                snackPosition: SnackPosition.BOTTOM,
-                margin: const EdgeInsets.all(16),
-              );
-            },
+            onTap: _addToCart,
           ),
         ),
       ),

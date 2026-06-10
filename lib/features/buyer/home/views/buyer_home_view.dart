@@ -7,6 +7,7 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../../core/models/food_item.dart';
 import '../../../../core/widgets/product_image.dart';
 import '../../../../core/widgets/my_text.dart';
+import '../../../cart/controllers/cart_controller.dart';
 import '../../../products/controllers/product_controller.dart';
 
 class BuyerHomeView extends GetView<ProductController> {
@@ -18,13 +19,17 @@ class BuyerHomeView extends GetView<ProductController> {
       appBar: AppBar(
         title: const MyText.title(AppStrings.appName),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Badge(
-              label: Text('2'),
-              child: Icon(Icons.shopping_cart_outlined),
-            ),
-          ),
+          Obx(() {
+            final count = Get.find<CartController>().itemCount;
+            return IconButton(
+              onPressed: () {},
+              icon: Badge(
+                isLabelVisible: count > 0,
+                label: Text('$count'),
+                child: const Icon(Icons.shopping_cart_outlined),
+              ),
+            );
+          }),
         ],
       ),
       body: Obx(() {

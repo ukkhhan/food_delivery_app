@@ -35,6 +35,7 @@ class AppStrings {
   static const remove = 'Remove';
 
   static const orderHistory = 'Order History';
+  static const orderPlacedSuccess = 'Order placed successfully';
   static const trackOrder = 'Track Order';
   static const orderDetails = 'Order Details';
   static const orderPlaced = 'Order Placed';
@@ -76,6 +77,7 @@ class AppStrings {
   static const incomingOrders = 'Incoming Orders';
   static const updateStatus = 'Update Status';
   static const markPreparing = 'Mark Preparing';
+  static const markOnTheWay = 'Mark On the way';
   static const markDelivered = 'Mark Delivered';
   static const noProducts = 'No products yet';
   static const noProductsHint = 'Add your first item to the menu';
