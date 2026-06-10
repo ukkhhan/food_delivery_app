@@ -4,43 +4,16 @@ import 'package:get/get.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/data/mock_data.dart';
 import '../../../../core/models/food_item.dart';
-import '../../../../core/widgets/food_image_box.dart';
+import '../../../../core/widgets/product_image.dart';
 import '../../../../core/widgets/my_text.dart';
+import '../../../products/controllers/product_controller.dart';
 
-class BuyerHomeView extends StatefulWidget {
+class BuyerHomeView extends GetView<ProductController> {
   const BuyerHomeView({super.key});
 
   @override
-  State<BuyerHomeView> createState() => _BuyerHomeViewState();
-}
-
-class _BuyerHomeViewState extends State<BuyerHomeView> {
-  String _selectedCategory = 'All';
-  final _searchController = TextEditingController();
-
-  List<FoodItem> get _filtered {
-    final query = _searchController.text.toLowerCase();
-    return MockData.foods.where((item) {
-      final matchesCategory =
-          _selectedCategory == 'All' || item.category == _selectedCategory;
-      final matchesSearch =
-          query.isEmpty || item.name.toLowerCase().contains(query);
-      return matchesCategory && matchesSearch;
-    }).toList();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final items = _filtered;
-
     return Scaffold(
       appBar: AppBar(
         title: const MyText.title(AppStrings.appName),
@@ -54,46 +27,63 @@ class _BuyerHomeViewState extends State<BuyerHomeView> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-        children: [
-          TextField(
-            controller: _searchController,
-            onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(
-              hintText: AppStrings.searchFood,
-              prefixIcon: Icon(Icons.search),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final items = controller.filteredProducts;
+        final categories = controller.categories;
+
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          children: [
+            TextField(
+              onChanged: controller.setSearch,
+              decoration: const InputDecoration(
+                hintText: AppStrings.searchFood,
+                prefixIcon: Icon(Icons.search),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          const MyText.title(AppStrings.popularItems),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 36,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: MockData.categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (_, i) {
-                final cat = MockData.categories[i];
-                final selected = cat == _selectedCategory;
-                return ChoiceChip(
-                  label: Text(cat),
-                  selected: selected,
-                  onSelected: (_) => setState(() => _selectedCategory = cat),
-                  selectedColor: AppColors.primary,
-                  labelStyle: TextStyle(
-                    color: selected ? Colors.white : AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                );
-              },
+            const SizedBox(height: 20),
+            const MyText.title(AppStrings.popularItems),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 36,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: categories.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, i) {
+                  final cat = categories[i];
+                  final selected = controller.selectedCategory.value == cat;
+                  return ChoiceChip(
+                    label: Text(cat),
+                    selected: selected,
+                    onSelected: (_) => controller.setCategory(cat),
+                    selectedColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      color: selected ? Colors.white : AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ...items.map((item) => _FoodCard(item: item)),
-        ],
-      ),
+            const SizedBox(height: 16),
+            if (items.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(top: 40),
+                child: MyText.caption(
+                  AppStrings.noProductsHint,
+                  align: TextAlign.center,
+                ),
+              )
+            else
+              ...items.map((item) => _FoodCard(item: item)),
+          ],
+        );
+      }),
     );
   }
 }
@@ -117,7 +107,7 @@ class _FoodCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            FoodImageBox(emoji: item.emoji, height: 72, width: 72),
+            ProductImage(productId: item.id, height: 72, width: 72),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

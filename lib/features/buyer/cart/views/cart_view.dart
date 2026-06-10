@@ -7,7 +7,7 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../../core/data/mock_data.dart';
 import '../../../../core/models/food_item.dart';
 import '../../../../core/widgets/empty_state.dart';
-import '../../../../core/widgets/food_image_box.dart';
+import '../../../../core/widgets/product_image.dart';
 import '../../../../core/widgets/my_button.dart';
 import '../../../../core/widgets/my_text.dart';
 
@@ -100,7 +100,7 @@ class _CartTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          FoodImageBox(emoji: item.emoji, height: 64, width: 64),
+          ProductImage(productId: item.id, height: 64, width: 64),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

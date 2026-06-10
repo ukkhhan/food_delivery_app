@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/models/food_item.dart';
-import '../../../../core/widgets/food_image_box.dart';
+import '../../../../core/widgets/product_image.dart';
 import '../../../../core/widgets/my_button.dart';
 import '../../../../core/widgets/my_text.dart';
 
@@ -32,7 +32,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          FoodImageBox(emoji: item.emoji, height: 200, radius: 16),
+          ProductImage(productId: item.id, height: 200, radius: 16),
           const SizedBox(height: 20),
           MyText.display(item.name),
           const SizedBox(height: 6),

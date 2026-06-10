@@ -3,8 +3,6 @@ import '../models/notification_model.dart';
 import '../models/order_model.dart';
 
 class MockData {
-  static const categories = ['All', 'Burger', 'Pizza', 'Drinks', 'Dessert'];
-
   static const foods = [
     FoodItem(
       id: '1',
@@ -12,7 +10,7 @@ class MockData {
       description: 'Juicy beef patty, cheddar, lettuce and house sauce.',
       price: 8.99,
       category: 'Burger',
-      emoji: '🍔',
+      sellerId: 'mock',
     ),
     FoodItem(
       id: '2',
@@ -20,7 +18,7 @@ class MockData {
       description: 'Fresh mozzarella, basil and tomato on thin crust.',
       price: 11.50,
       category: 'Pizza',
-      emoji: '🍕',
+      sellerId: 'mock',
     ),
     FoodItem(
       id: '3',
@@ -28,31 +26,7 @@ class MockData {
       description: 'Cold brew espresso with milk over ice.',
       price: 4.25,
       category: 'Drinks',
-      emoji: '🥤',
-    ),
-    FoodItem(
-      id: '4',
-      name: 'Chocolate Brownie',
-      description: 'Warm fudge brownie with dark chocolate chunks.',
-      price: 3.99,
-      category: 'Dessert',
-      emoji: '🍫',
-    ),
-    FoodItem(
-      id: '5',
-      name: 'Spicy Chicken Wrap',
-      description: 'Grilled chicken, jalapeño mayo and crunchy veggies.',
-      price: 7.49,
-      category: 'Burger',
-      emoji: '🌯',
-    ),
-    FoodItem(
-      id: '6',
-      name: 'Pepperoni Feast',
-      description: 'Double pepperoni with extra cheese.',
-      price: 13.99,
-      category: 'Pizza',
-      emoji: '🍕',
+      sellerId: 'mock',
     ),
   ];
 
@@ -107,11 +81,4 @@ class MockData {
       isRead: true,
     ),
   ];
-
-  static FoodItem? foodById(String id) {
-    for (final item in foods) {
-      if (item.id == id) return item;
-    }
-    return null;
-  }
 }
