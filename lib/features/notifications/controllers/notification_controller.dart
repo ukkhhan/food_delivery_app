@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../core/models/notification_model.dart'
     show NotificationAudience, NotificationModel;
+import '../../auth/data/models/user_model.dart';
 import '../../auth/data/services/auth_service.dart';
 import '../data/repositories/notification_repository.dart';
 
@@ -12,10 +13,11 @@ class NotificationController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
 
   final notifications = <NotificationModel>[].obs;
-  final isLoading = true.obs;
+  final isLoading = false.obs;
 
   StreamSubscription<List<NotificationModel>>? _subscription;
   StreamSubscription? _userSubscription;
+  String? _activeUserId;
 
   List<NotificationModel> forAudience(NotificationAudience audience) =>
       notifications.where((n) => n.audience == audience).toList();
@@ -26,15 +28,8 @@ class NotificationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _userSubscription = _authService.user.listen((user) {
-      _subscription?.cancel();
-      if (user == null) {
-        notifications.clear();
-        isLoading.value = false;
-        return;
-      }
-      _listen(user.uid);
-    });
+    _userSubscription = _authService.user.listen(_onUserChanged);
+    _onUserChanged(_authService.user.value);
   }
 
   @override
@@ -44,20 +39,43 @@ class NotificationController extends GetxController {
     super.onClose();
   }
 
-  Future<void> _listen(String userId) async {
-    isLoading.value = true;
+  void _onUserChanged(UserModel? user) {
+    if (user == null) {
+      _subscription?.cancel();
+      _subscription = null;
+      _activeUserId = null;
+      notifications.clear();
+      isLoading.value = false;
+      return;
+    }
+
+    if (_activeUserId == user.uid) return;
+
+    _subscription?.cancel();
+    _activeUserId = user.uid;
+    _listen(user.uid, showLoading: notifications.isEmpty);
+  }
+
+  Future<void> _listen(String userId, {required bool showLoading}) async {
+    if (showLoading) isLoading.value = true;
+
     try {
       final items = await _repository.fetchForUser(userId);
+      if (_activeUserId != userId) return;
       notifications.assignAll(items);
     } catch (_) {
-      notifications.clear();
+      if (_activeUserId == userId) notifications.clear();
     } finally {
-      isLoading.value = false;
+      if (_activeUserId == userId) isLoading.value = false;
     }
+
+    if (_activeUserId != userId) return;
 
     _subscription?.cancel();
     _subscription = _repository.watchForUser(userId).listen(
-      (items) => notifications.assignAll(items),
+      (items) {
+        if (_activeUserId == userId) notifications.assignAll(items);
+      },
       cancelOnError: false,
     );
   }

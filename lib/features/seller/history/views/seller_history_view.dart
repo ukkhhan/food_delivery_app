@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/my_text.dart';
@@ -9,8 +10,8 @@ import '../../../../core/widgets/order_history_stats.dart';
 import '../../../orders/controllers/order_controller.dart';
 import '../../../orders/utils/order_stats.dart';
 
-class OrdersView extends GetView<OrderController> {
-  const OrdersView({super.key});
+class SellerHistoryView extends GetView<OrderController> {
+  const SellerHistoryView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class OrdersView extends GetView<OrderController> {
 
         if (orders.isEmpty) {
           return const EmptyState(
-            icon: Icons.receipt_long_outlined,
+            icon: Icons.history,
             title: AppStrings.noOrdersYet,
             subtitle: AppStrings.noOrdersHint,
           );
@@ -44,22 +45,31 @@ class OrdersView extends GetView<OrderController> {
                   const MyText.subtitle(AppStrings.historySummary),
                   const SizedBox(height: 12),
                   OrderHistoryStats(
-                    totalLabel: AppStrings.totalOrders,
+                    totalLabel: AppStrings.ordersReceived,
                     deliveredLabel: AppStrings.ordersDelivered,
-                    itemsLabel: AppStrings.itemsPurchased,
-                    amountLabel: AppStrings.totalSpent,
+                    itemsLabel: AppStrings.itemsSold,
+                    amountLabel: AppStrings.totalRevenue,
                     totalOrders: stats.totalOrders,
                     deliveredOrders: stats.deliveredOrders,
                     totalItems: stats.totalItems,
                     totalAmount: stats.totalAmount,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
+                  MyText.caption(
+                    '${AppStrings.activeOrders}: ${stats.activeOrders}',
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(height: 4),
                   const MyText.subtitle(AppStrings.pastOrders),
                 ],
               );
             }
 
-            return OrderHistoryCard(order: orders[i - 1]);
+            final order = orders[i - 1];
+            return OrderHistoryCard(
+              order: order,
+              subtitle: '${AppStrings.buyerMode}: ${order.buyerName}',
+            );
           },
         );
       }),

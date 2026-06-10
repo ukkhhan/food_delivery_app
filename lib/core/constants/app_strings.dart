@@ -43,6 +43,16 @@ class AppStrings {
   static const remove = 'Remove';
 
   static const orderHistory = 'Order History';
+  static const historySummary = 'History Summary';
+  static const pastOrders = 'Past Orders';
+  static const totalOrders = 'Total orders';
+  static const ordersReceived = 'Orders received';
+  static const ordersDelivered = 'Delivered';
+  static const activeOrders = 'Active orders';
+  static const itemsPurchased = 'Items bought';
+  static const itemsSold = 'Items sold';
+  static const totalSpent = 'Total spent';
+  static const totalRevenue = 'Total revenue';
   static const orderPlacedSuccess = 'Order placed successfully';
   static const trackOrder = 'Track Order';
   static const orderDetails = 'Order Details';

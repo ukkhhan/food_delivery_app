@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../app/routes/app_routes.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/models/order_model.dart';
@@ -17,7 +18,16 @@ class SellerDashboardView extends GetView<OrderController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const MyText.title(AppStrings.incomingOrders)),
+      appBar: AppBar(
+        title: const MyText.title(AppStrings.incomingOrders),
+        actions: [
+          IconButton(
+            tooltip: AppStrings.orderHistory,
+            onPressed: () => Get.toNamed(AppRoutes.sellerHistory),
+            icon: const Icon(Icons.history),
+          ),
+        ],
+      ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

@@ -12,6 +12,7 @@ import '../../features/products/bindings/buyer_shell_binding.dart';
 import '../../features/products/bindings/product_binding.dart';
 import '../../features/products/bindings/seller_shell_binding.dart';
 import '../../features/products/controllers/product_controller.dart';
+import '../../features/seller/history/views/seller_history_view.dart';
 import '../../features/seller/products/views/product_form_view.dart';
 import '../../features/seller/shell/seller_shell_view.dart';
 import '../../features/splash/views/splash_view.dart';
@@ -69,6 +70,15 @@ class AppPages {
       binding: BindingsBuilder(() {
         if (!Get.isRegistered<ProductController>()) {
           ProductBinding(sellerMode: true).dependencies();
+        }
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.sellerHistory,
+      page: () => const SellerHistoryView(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<OrderController>()) {
+          OrderBinding(sellerMode: true).dependencies();
         }
       }),
     ),

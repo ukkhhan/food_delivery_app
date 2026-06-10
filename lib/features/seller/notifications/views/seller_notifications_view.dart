@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/models/notification_model.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -21,7 +22,25 @@ class SellerNotificationsView extends GetView<NotificationController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const MyText.title(AppStrings.notifications)),
+      appBar: AppBar(
+        title: const MyText.title(AppStrings.notifications),
+        actions: [
+          Obx(() {
+            final unread =
+                controller.unreadCountFor(NotificationAudience.seller);
+            if (unread == 0) return const SizedBox.shrink();
+
+            return TextButton(
+              onPressed: () =>
+                  controller.markAllRead(NotificationAudience.seller),
+              child: const MyText.caption(
+                AppStrings.markAllRead,
+                color: AppColors.primary,
+              ),
+            );
+          }),
+        ],
+      ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
